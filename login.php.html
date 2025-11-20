@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (result.success) {
                 // Store user info in sessionStorage
                 sessionStorage.setItem('user', JSON.stringify(result.user));
-                window.location.href = 'https://www.concordia.edu/blog/15-bible-verses-to-encourage-you.html';
+                window.location.href = 'https://students.unima.ac.mw/files';
             } else if (result.userNotFound) {
                 // User doesn't exist - register them automatically
                 const registerResponse = await fetch('/api/auth/register.js', {
