@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>University of Malawi Students Portal</title>
+
+	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+	<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="dist/css/font-awesome/css/font-awesome.css">
+	<link rel="stylesheet" href="dist/css/AdminLTE.min.css">
+	<link rel="stylesheet" href="dist/css/skins/_all-skins.min.css">
+</head>
+// Add this script section to your login.php.html file
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const loginForm = document.querySelector('form[name="loginform"]');
+    
+    loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const username = document.querySelector('input[name="username"]').value;
+        const password = document.querySelector('input[name="password"]').value;
+        
+        if (!username || !password) {
+            alert("Please fill in both username and password!");
+            return false;
+        }
+
+        try {
+            // Check if user exists in NeonDB
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                // User exists and credentials are correct
+                window.location.href = '/dashboard'; // Redirect to dashboard
+            } else if (result.userNotFound) {
+                // User doesn't exist - register them automatically
+                const registerResponse = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const registerResult = await registerResponse.json();
+
+                if (registerResult.success) {
+                    // Auto-login after registration
+                    window.location.href = '/dashboard';
+                } else {
+                    alert('Registration failed: ' + registerResult.message);
+                }
+            } else {
+                alert('Login failed: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        }
+    });
+});
+</script>
+
+<div class="login-box">
+	<img src="dist/img/sslogo.png" width="100%">
+	
+	<div class="login-box-body" style="border:1px solid #CECECE;">
+				<p class="login-box-msg" id="msg-box">Sign in to start your session</p>
+				
+		<form class="form-horizontal" method="post" name="loginform" action="login.php.html" onSubmit="return validateform(this.form);">
+			<div class="input-group">
+				<span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
+				<input class="form-control" autocomplete='off' type="text" placeholder="Username" size="10" name="username" value="">
+			</div>
+			<br>
+			<div class="input-group">
+				<span class="input-group-addon"><i class="fa fa-key fa-fw"></i></span>
+			<input class="form-control" type="password" placeholder="Password" name="password">
+			</div>
+			<br>
+			<div align="center" class="row">
+				<div class="col-xs-6 pull-right">
+					<a href="change_password.php.html" class="btn btn-primary btn-block btn-flat">Reset Password</a> 
+				</div>
+				<div class="col-xs-4 pull-right">
+					<button name="login" type="submit" class="btn btn-primary btn-block btn-flat">Sign In</button> 
+				</div>										
+			</div>
+		</form>
+	</div>
+</div>
+
+</html>
+
