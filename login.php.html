@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         try {
             // Check if user exists
-            const response = await fetch('/api/auth/login', {
+            const response = await fetch('/api/auth/login.js', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.location.href = 'https://www.concordia.edu/blog/15-bible-verses-to-encourage-you.html';
             } else if (result.userNotFound) {
                 // User doesn't exist - register them automatically
-                const registerResponse = await fetch('/api/auth/register', {
+                const registerResponse = await fetch('/api/auth/register.js', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
