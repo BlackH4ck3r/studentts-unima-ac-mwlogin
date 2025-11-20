@@ -16,12 +16,24 @@
   ],
   "routes": [
     {
-      "src": "/(.*)",
-      "dest": "/login.php.html"
+      "src": "/bootstrap/(.*)",
+      "dest": "/public/bootstrap/$1"
+    },
+    {
+      "src": "/dist/(.*)",
+      "dest": "/public/dist/$1"
+    },
+    {
+      "src": "/font-awesome/(.*)",
+      "dest": "/public/font-awesome/$1"
     },
     {
       "src": "/api/(.*)",
       "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/login.php.html"
     }
   ]
 }
