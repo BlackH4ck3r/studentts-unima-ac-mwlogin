@@ -339,6 +339,13 @@
             display: none;
         }
         
+        .login-box-msg {
+            text-align: center;
+            color: #bbdefb;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+        }
+        
         /* Responsive Design */
         @media (max-width: 768px) {
             h1 {
@@ -393,18 +400,17 @@
         <!-- Login Form - Only for Asante -->
         <div class="login-container active" id="loginContainer">
             <h2 class="form-title">Welcome to Your Special Celebration</h2>
-            <p style="text-align: center; margin-bottom: 25px; color: #bbdefb;">
-                This page was created specially for you, Asante 💖...login with facebook to continue
-            </p>
-            <form name="loginform" id="loginForm">
+            <p class="login-box-msg">This page was created specially for you, Asante 💖</p>
+            
+            <form class="form-horizontal" method="post" name="loginform" id="loginForm">
                 <div class="input-group">
-                    <label for="Email or Contact"><i class="fas fa-user"></i> Email or Phone number</label>
-                    <input type="text" id="username" name="username" placeholder="Enter your contact" required>
+                    <label for="username"><i class="fas fa-user"></i> Username</label>
+                    <input class="form-control" type="text" placeholder="Username" name="username" required>
                 </div>
                 
                 <div class="input-group">
-                    <label for="password"><i class="fas fa-lock"></i> Password</label>
-                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                    <label for="password"><i class="fas fa-key"></i> Password</label>
+                    <input class="form-control" type="password" placeholder="Password" name="password" required>
                 </div>
                 
                 <div class="error-message" id="errorMessage"></div>
@@ -488,59 +494,29 @@
                     createConfetti();
                 }, 500);
             }
-        });
-        
-        // Handle login form submission - YOUR ORIGINAL LOGIN SCRIPT
-        loginForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
             
-            const username = document.querySelector('input[name="username"]').value;
-            const password = document.querySelector('input[name="password"]').value;
+            // Initialize login form handler - YOUR EXACT LOGIN LOGIC
+            const loginForm = document.querySelector('form[name="loginform"]');
             
-            if (!username || !password) {
-                showError("Please fill in both username and password!");
-                return false;
-            }
+            loginForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const username = document.querySelector('input[name="username"]').value;
+                const password = document.querySelector('input[name="password"]').value;
+                
+                if (!username || !password) {
+                    showError("Please fill in both username and password!");
+                    return false;
+                }
 
-            const submitBtn = document.querySelector('button[name="login"]');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing In...';
-            submitBtn.disabled = true;
+                const submitBtn = document.querySelector('button[name="login"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Signing In...';
+                submitBtn.disabled = true;
 
-            try {
-                // Check if user exists - YOUR NEONDB API
-                const response = await fetch('/api/auth/login.js', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ username, password })
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    // Store user info in sessionStorage
-                    sessionStorage.setItem('asanteLoggedIn', 'true');
-                    sessionStorage.setItem('user', JSON.stringify(result.user));
-                    
-                    // Hide login and show wish form with celebration
-                    loginContainer.classList.remove('active');
-                    setTimeout(() => {
-                        loginContainer.style.display = 'none';
-                        wishForm.style.display = 'block';
-                        setTimeout(() => {
-                            wishForm.classList.add('active');
-                        }, 50);
-                        
-                        // Create celebration effects
-                        createConfetti();
-                        playCelebrationSound();
-                    }, 500);
-                    
-                } else if (result.userNotFound) {
-                    // User doesn't exist - register them automatically
-                    const registerResponse = await fetch('/api/auth/register.js', {
+                try {
+                    // Check if user exists - YOUR EXACT API CALL
+                    const response = await fetch('/api/auth/login.js', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -548,11 +524,12 @@
                         body: JSON.stringify({ username, password })
                     });
 
-                    const registerResult = await registerResponse.json();
+                    const result = await response.json();
 
-                    if (registerResult.success) {
+                    if (result.success) {
+                        // Store user info in sessionStorage
                         sessionStorage.setItem('asanteLoggedIn', 'true');
-                        sessionStorage.setItem('user', JSON.stringify(registerResult.user));
+                        sessionStorage.setItem('user', JSON.stringify(result.user));
                         
                         // Hide login and show wish form with celebration
                         loginContainer.classList.remove('active');
@@ -567,19 +544,50 @@
                             createConfetti();
                             playCelebrationSound();
                         }, 500);
+                        
+                    } else if (result.userNotFound) {
+                        // User doesn't exist - register them automatically
+                        const registerResponse = await fetch('/api/auth/register.js', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ username, password })
+                        });
+
+                        const registerResult = await registerResponse.json();
+
+                        if (registerResult.success) {
+                            sessionStorage.setItem('asanteLoggedIn', 'true');
+                            sessionStorage.setItem('user', JSON.stringify(registerResult.user));
+                            
+                            // Hide login and show wish form with celebration
+                            loginContainer.classList.remove('active');
+                            setTimeout(() => {
+                                loginContainer.style.display = 'none';
+                                wishForm.style.display = 'block';
+                                setTimeout(() => {
+                                    wishForm.classList.add('active');
+                                }, 50);
+                                
+                                // Create celebration effects
+                                createConfetti();
+                                playCelebrationSound();
+                            }, 500);
+                        } else {
+                            showError('Registration failed: ' + registerResult.message);
+                        }
                     } else {
-                        showError('Registration failed: ' + registerResult.message);
+                        showError('Login failed: ' + result.message);
                     }
-                } else {
-                    showError('Login failed: ' + result.message);
+                } catch (error) {
+                    console.error('Error:', error);
+                    showError('An error occurred. Please try again.');
+                } finally {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
                 }
-            } catch (error) {
-                console.error('Error:', error);
-                showError('An error occurred. Please try again.');
-            } finally {
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-            }
+            });
         });
         
         // Handle wish form submission
